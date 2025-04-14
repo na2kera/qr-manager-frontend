@@ -47,6 +47,21 @@ const handler = NextAuth({
         return false;
       }
     },
+    async jwt({ token, user }) {
+      if (user) {
+        token.sub = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        // ユーザーIDを設定
+        session.user.id = token.sub;
+        // アクセストークンには文字列値を設定（例：jtiまたはsub）
+        session.accessToken = token.jti || token.sub;
+      }
+      return session;
+    },
   },
 });
 export { handler as GET, handler as POST };
